@@ -2,11 +2,14 @@ package handlers
 
 import (
 	"github.com/go-redis/redis"
-	"github.com/izzettinozbektas/golang-api/helpers"
+	"github.com/izzettinozbektas/golang-api/internal/helpers"
 	"log"
 	"net/http"
 	"time"
 )
+
+// redis client connect
+var client = helpers.ConnetToRedis()
 
 // home is the handler
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -14,7 +17,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 // redis the handler
-func QuoteOfTheDayHandler(client *redis.Client) http.HandlerFunc {
+func QuoteOfTheDayHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		currentTime := time.Now()
 		date := currentTime.Format("2006-01-02")

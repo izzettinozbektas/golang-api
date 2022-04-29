@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/izzettinozbektas/golang-api/model"
+	"github.com/go-redis/redis"
+	"github.com/izzettinozbektas/golang-api/internal/models"
 	"log"
 	"net/http"
 	"os"
@@ -13,7 +14,7 @@ import (
 	"time"
 )
 
-func GetQuoteFromAPI() (*model.QuoteResponse, error) {
+func GetQuoteFromAPI() (*models.QuoteResponse, error) {
 	API_URL := "http://quotes.rest/qod.json"
 	resp, err := http.Get(API_URL)
 	if err != nil {
@@ -23,7 +24,7 @@ func GetQuoteFromAPI() (*model.QuoteResponse, error) {
 	log.Println("Quote API Returned: ", resp.StatusCode, http.StatusText(resp.StatusCode))
 
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
-		quoteResp := &model.QuoteResponse{}
+		quoteResp := &models.QuoteResponse{}
 		json.NewDecoder(resp.Body).Decode(quoteResp)
 		return quoteResp, nil
 	} else {
@@ -46,4 +47,27 @@ func WaitForShutdown(srv *http.Server) {
 
 	log.Println("Shutting down")
 	os.Exit(0)
+}
+
+func ConnetToRedis() redis.Client {
+	// Create Redis Client
+	client := redis.NewClient(&redis.Options{
+		Addr:     getEnv("REDIS_URL", "localhost:6379"),
+		Password: getEnv("REDIS_PASSWORD", ""),
+		DB:       0,
+	})
+
+	_, err := client.Ping().Result()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return *client
+}
+
+func getEnv(key, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }

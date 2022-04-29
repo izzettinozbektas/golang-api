@@ -1,30 +1,17 @@
 package main
 
 import (
-	"github.com/go-redis/redis"
-	"github.com/izzettinozbektas/golang-api/helpers"
-	"github.com/izzettinozbektas/golang-api/routes"
+	"github.com/izzettinozbektas/golang-api/cmd/routes"
+	"github.com/izzettinozbektas/golang-api/internal/helpers"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
 func main() {
-	// Create Redis Client
-	client := redis.NewClient(&redis.Options{
-		Addr:     getEnv("REDIS_URL", "localhost:6379"),
-		Password: getEnv("REDIS_PASSWORD", ""),
-		DB:       0,
-	})
-
-	_, err := client.Ping().Result()
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	srv := &http.Server{
-		Handler:      routes.Routes(client),
+		Handler:      routes.Routes(),
 		Addr:         ":8080",
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -40,12 +27,4 @@ func main() {
 
 	// Graceful Shutdown
 	helpers.WaitForShutdown(srv)
-}
-
-func getEnv(key, defaultValue string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		return defaultValue
-	}
-	return value
 }
