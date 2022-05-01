@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	srv := &http.Server{
 		Handler:      routes.Routes(),
 		Addr:         ":8080",

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"github.com/go-redis/redis"
 	"github.com/izzettinozbektas/golang-api/internal/models"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"os"
@@ -70,4 +71,9 @@ func getEnv(key, defaultValue string) string {
 		return defaultValue
 	}
 	return value
+}
+
+func HashPassword(password string) string {
+	hashpassword, _ := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(hashpassword)
 }

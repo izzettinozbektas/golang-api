@@ -15,6 +15,10 @@ services:
       - phpmyadmin
     environment: # Pass environment variables to the service
       REDIS_URL: redis:6379
+      MYSQL_DATABASE: golang-db
+      MYSQL_HOST: app-mysql  #add to!!
+      MYSQL_USER: golang
+      MYSQL_PASSWORD: golangpass
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
       - app-network
 
