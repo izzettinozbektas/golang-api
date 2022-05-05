@@ -88,3 +88,38 @@ func (m *mysqlDBRepo) UserUpdate(id int, res models.User) error {
 
 	return nil
 }
+func (m *mysqlDBRepo) User(id int) (models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var user models.User
+
+	query := `select id, first_name, last_name, email, access_level, created_at, updated_at from users where id = ?`
+	row := m.DB.QueryRowContext(ctx, query, id)
+	err := row.Scan(
+		&user.ID,
+		&user.FirstName,
+		&user.LastName,
+		&user.Email,
+		&user.AccessLevel,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+func (m *mysqlDBRepo) UserDelete(id int) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := "delete from users where id = ?"
+
+	_, err := m.DB.ExecContext(ctx, query, id)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

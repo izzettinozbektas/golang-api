@@ -3,26 +3,13 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/go-chi/chi"
-	"github.com/izzettinozbektas/golang-api/internal/driver"
 	"github.com/izzettinozbektas/golang-api/internal/helpers"
 	"github.com/izzettinozbektas/golang-api/internal/models"
-	"github.com/izzettinozbektas/golang-api/internal/repository"
-	"github.com/izzettinozbektas/golang-api/internal/repository/dbrepo"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
 )
-
-func NewPostHandler(db *driver.DB) *Repository {
-	return &Repository{
-		DB: dbrepo.NewMysqlRepo(db.SQL),
-	}
-}
-
-type Repository struct {
-	DB repository.DatabaseRepo
-}
 
 func (m *Repository) UserCreate(w http.ResponseWriter, r *http.Request) {
 
@@ -78,15 +65,57 @@ func (m *Repository) UserUpdate(w http.ResponseWriter, r *http.Request) {
 	user.UpdatedAt = time.Now()
 
 	err := m.DB.UserUpdate(id, user)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	resp := make(map[string]string)
-	resp["message"] = "İşlem Başarılı"
+	if err != nil {
+		resp["message"] = err.Error()
+	} else {
+		resp["message"] = "İşlem Başarılı"
+	}
 
 	jresp, _ := json.Marshal(resp)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write(jresp)
+}
+func (m *Repository) User(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	user, err := m.DB.User(id)
+	resp := make(map[string]interface{})
+	if err != nil {
+		resp["message"] = err.Error()
+	} else {
+		resp["user"] = user
+	}
+
+	jresp, jerr := json.Marshal(resp)
+	if jerr != nil {
+		log.Fatal(jerr)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	w.Write(jresp)
+
+}
+func (m *Repository) UserDelete(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	status, err := m.DB.UserDelete(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	resp := make(map[string]interface{})
+
+	if status == true {
+		resp["message"] = "işlem başarılı"
+	}
+
+	jresp, jerr := json.Marshal(resp)
+	if jerr != nil {
+		log.Fatal(jerr)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	w.Write(jresp)
+
 }

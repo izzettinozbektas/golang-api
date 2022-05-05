@@ -34,10 +34,13 @@ func Routes() http.Handler {
 	mux := chi.NewRouter()
 
 	mux.Get("/", handlers.Home)
-	mux.Get("/redis", handlers.QuoteOfTheDayHandler())
-	mux.Post("/user", handlers.NewPostHandler(connection).UserCreate)
-	mux.Get("/users", handlers.NewPostHandler(connection).Users)
-	mux.Post("/user/{id}", handlers.NewPostHandler(connection).UserUpdate)
+	mux.Get("/redis", handlers.Redis)
+	//user Route
+	mux.Post("/user", handlers.ConnectionToDB(connection).UserCreate)
+	mux.Get("/users", handlers.ConnectionToDB(connection).Users)
+	mux.Put("/user/{id}", handlers.ConnectionToDB(connection).UserUpdate)
+	mux.Get("/user/{id}", handlers.ConnectionToDB(connection).User)
+	mux.Delete("/user/{id}", handlers.ConnectionToDB(connection).UserDelete)
 
 	return mux
 }
