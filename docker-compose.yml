@@ -1,10 +1,5 @@
-# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
-
-version: '3'
-
-# Define services
+version: "3.8"
 services:
-
   # App Service
   app:
     # Configuration for building the docker image for the service
@@ -15,18 +10,54 @@ services:
       - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
     restart: unless-stopped
     depends_on:
-      - redis # This service depends on redis. Start that first.
+      - redis
+      - mysql
+      - phpmyadmin
     environment: # Pass environment variables to the service
       REDIS_URL: redis:6379
+      MYSQL_DATABASE: golang-db
+      MYSQL_HOST: app-mysql  #add to!!
+      MYSQL_USER: golang
+      MYSQL_PASSWORD: golangpass
     networks: # Networks to join (Services on the same network can communicate with each other using their name)
-      - backend
+      - app-network
 
   # Redis Service
   redis:
     image: "redis:alpine" # Use a public Redis image to build the redis service
     restart: unless-stopped
     networks:
-      - backend
+      - app-network
+
+  # Mysql service
+  mysql:
+    image: mysql:8.0
+    container_name: app-mysql
+    restart: always
+    environment:
+      - MYSQL_DATABASE=golang-db
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=golang
+      - MYSQL_PASSWORD=golangpass
+    volumes:
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  # Phpmyadmin service
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_ARBITRARY=1
+    networks:
+      - app-network
 
 networks:
-  backend:
+  app-network:
+    driver: bridge
