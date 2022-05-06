@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"encoding/json"
 	"github.com/go-chi/chi"
 	"github.com/izzettinozbektas/golang-api/internal/helpers"
 	"github.com/izzettinozbektas/golang-api/internal/models"
+	"github.com/izzettinozbektas/golang-api/internal/response"
 	"log"
 	"net/http"
 	"strconv"
@@ -23,17 +23,10 @@ func (m *Repository) UserCreate(w http.ResponseWriter, r *http.Request) {
 	user.UpdatedAt = time.Now()
 
 	err := m.DB.UserCreate(user)
-
-	resp := make(map[string]string)
 	if err != nil {
 		log.Fatal(err)
 	}
-	resp["message"] = "Kayıt Başarılı"
-
-	jresp, _ := json.Marshal(resp)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(jresp)
+	response.Write(w, response.Success("işlem başarılı", nil), response.Code(http.StatusCreated))
 }
 func (m *Repository) Users(w http.ResponseWriter, r *http.Request) {
 	users, err := m.DB.Users()
@@ -43,13 +36,7 @@ func (m *Repository) Users(w http.ResponseWriter, r *http.Request) {
 	resp := make(map[string]interface{})
 	resp["users"] = users
 
-	jresp, jerr := json.Marshal(resp)
-	if jerr != nil {
-		log.Fatal(jerr)
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(jresp)
+	response.Write(w, response.Success("", resp), response.Code(http.StatusOK))
 
 }
 func (m *Repository) UserUpdate(w http.ResponseWriter, r *http.Request) {
@@ -65,17 +52,10 @@ func (m *Repository) UserUpdate(w http.ResponseWriter, r *http.Request) {
 	user.UpdatedAt = time.Now()
 
 	err := m.DB.UserUpdate(id, user)
-	resp := make(map[string]string)
 	if err != nil {
-		resp["message"] = err.Error()
-	} else {
-		resp["message"] = "İşlem Başarılı"
+		log.Fatal(err)
 	}
-
-	jresp, _ := json.Marshal(resp)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(jresp)
+	response.Write(w, response.Success("işlem başarılı", nil), response.Code(http.StatusOK))
 }
 func (m *Repository) User(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
@@ -83,19 +63,11 @@ func (m *Repository) User(w http.ResponseWriter, r *http.Request) {
 	user, err := m.DB.User(id)
 	resp := make(map[string]interface{})
 	if err != nil {
-		resp["message"] = err.Error()
+		response.Write(w, response.Error("işlem başarısız", map[string]string{"error": err.Error()}), response.Code(http.StatusNotFound))
 	} else {
 		resp["user"] = user
+		response.Write(w, response.Success("", resp), response.Code(http.StatusOK))
 	}
-
-	jresp, jerr := json.Marshal(resp)
-	if jerr != nil {
-		log.Fatal(jerr)
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(jresp)
-
 }
 func (m *Repository) UserDelete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
@@ -104,18 +76,8 @@ func (m *Repository) UserDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	resp := make(map[string]interface{})
-
 	if status == true {
-		resp["message"] = "işlem başarılı"
+		response.Write(w, response.Success("işlem başarılı", nil), response.Code(http.StatusOK))
 	}
-
-	jresp, jerr := json.Marshal(resp)
-	if jerr != nil {
-		log.Fatal(jerr)
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(jresp)
 
 }

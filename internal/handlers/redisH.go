@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"encoding/json"
 	"github.com/go-redis/redis"
 	"github.com/izzettinozbektas/golang-api/internal/helpers"
+	"github.com/izzettinozbektas/golang-api/internal/response"
 	"log"
 	"net/http"
 	"time"
@@ -29,14 +29,10 @@ func Redis(w http.ResponseWriter, r *http.Request) {
 		}
 		quote := "Redisden gelen random string: " + quoteResp.Contents.Quotes[0].Quote
 		client.Set(date, quote, 24*time.Hour)
-		resp["message"] = quote
+		resp["data"] = quote
 	} else {
 		log.Println("Cache Hit for date ", date)
-		resp["message"] = val
+		resp["data"] = val
 	}
-
-	jresp, _ := json.Marshal(resp)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(jresp)
+	response.Write(w, response.Success("", resp), response.Code(http.StatusOK))
 }
