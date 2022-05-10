@@ -3,6 +3,7 @@ package routes
 import (
 	"fmt"
 	"github.com/go-chi/chi"
+	"github.com/izzettinozbektas/golang-api/cmd/middleware"
 	"github.com/izzettinozbektas/golang-api/internal/driver"
 	"github.com/izzettinozbektas/golang-api/internal/handlers"
 	"github.com/izzettinozbektas/golang-api/internal/helpers"
@@ -35,12 +36,18 @@ func Routes() http.Handler {
 
 	mux.Get("/", handlers.Home)
 	mux.Get("/redis", handlers.Redis)
-	//user Route
+	//login
+	mux.Post("/login", handlers.ConnectionToDB(connection).Login)
+	//user singup
 	mux.Post("/user", handlers.ConnectionToDB(connection).UserCreate)
-	mux.Get("/users", handlers.ConnectionToDB(connection).Users)
-	mux.Put("/user/{id}", handlers.ConnectionToDB(connection).UserUpdate)
-	mux.Get("/user/{id}", handlers.ConnectionToDB(connection).User)
-	mux.Delete("/user/{id}", handlers.ConnectionToDB(connection).UserDelete)
+
+	mux.With(middleware.Auth).Group(func(r chi.Router) {
+		r.Get("/users", handlers.ConnectionToDB(connection).Users)
+		r.Put("/user/{id}", handlers.ConnectionToDB(connection).UserUpdate)
+		r.Get("/user/{id}", handlers.ConnectionToDB(connection).User)
+		r.Delete("/user/{id}", handlers.ConnectionToDB(connection).UserDelete)
+		return
+	})
 
 	return mux
 }
