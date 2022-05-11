@@ -16,15 +16,24 @@ type DB struct {
 var dbConn = &DB{}
 
 // ConnectSQL ...
-func ConnectSQL(host, uname, pass, dbname string) (*DB, error) {
+func ConnectSQL() (*DB, error) {
+
+	//dbName := os.Getenv("DB_NAME")
+	//dbPass := os.Getenv("DB_PASS")
+	//dbHost := os.Getenv("DB_HOST")
+	//dbPort := os.Getenv("DB_PORT")
+	// geçici olarak basit kullanım
+	dbName := "golang-db"
+	dbUname := "golang"
+	dbPass := "golangpass"
+	dbHost := "app-mysql" // mysql container name olmalı
 
 	dbSource := fmt.Sprintf(
 		"%s:%s@tcp(%s)/%s?parseTime=true",
-		uname,
-		pass,
-		host,
-
-		dbname,
+		dbUname,
+		dbPass,
+		dbHost,
+		dbName,
 	)
 	d, err := sql.Open("mysql", dbSource)
 	if err != nil {

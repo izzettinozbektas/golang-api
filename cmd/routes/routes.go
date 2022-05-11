@@ -14,19 +14,7 @@ import (
 var client = helpers.ConnetToRedis
 
 func Routes() http.Handler {
-	//dbName := os.Getenv("DB_NAME")
-	//dbPass := os.Getenv("DB_PASS")
-	//dbHost := os.Getenv("DB_HOST")
-	//dbPort := os.Getenv("DB_PORT")
-	// geçici olarak basit kullanım
-	dbName := "golang-db"
-	dbUname := "golang"
-	dbPass := "golangpass"
-	dbHost := "app-mysql" // mysql container name olmalı
-
-	println("this is db", dbName, dbHost, dbPass)
-
-	connection, err := driver.ConnectSQL(dbHost, dbUname, dbPass, dbName)
+	connection, err := driver.ConnectSQL()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
