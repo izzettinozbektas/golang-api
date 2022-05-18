@@ -1,28 +1,35 @@
-# Start from golang:1.12-alpine base image
-FROM golang:1.16-alpine3.13
+FROM golang:1.17.6-alpine3.15
+# Set necessary environmet variables needed for our image
+ENV GO111MODULE=on \
+    CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
 
-# The latest alpine images don't have some tools like (`git` and `bash`).
-# Adding git, bash and openssh to the image
-RUN apk update && apk upgrade && \
-    apk add --no-cache bash git openssh
+RUN apk --no-cache add gcc g++ make ca-certificates
 
-# Set the Current Working Directory inside the container
-WORKDIR /app
 
-# Copy go mod and sum files
-COPY go.mod go.sum ./
+# Move to working directory /build
+WORKDIR /build
 
-# Download all dependancies. Dependencies will be cached if the go.mod and go.sum files are not changed
+# Copy and download dependency using go mod
+COPY go.mod .
+COPY go.sum .
 RUN go mod download
 
-# Copy the source from the current directory to the Working Directory inside the container
+# Copy the code into the container
 COPY . .
 
-# Build the Go app
-RUN go build -o main .
+# Build the application
+RUN go build -a -installsuffix cgo -o main cmd/main.go
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Move to /dist directory as the place for resulting binary folder
+WORKDIR /
 
-# Run the executable
-CMD ["./main"]
+# Copy binary from build to main folder
+RUN cp /build/main .
+
+# Export necessary port
+CMD gunicorn --bind 0.0.0.0:$PORT wsgi
+
+# Command to run when starting the container
+CMD ["/main"]
