@@ -2,40 +2,17 @@ package driver
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// DB ...
 type DB struct {
 	SQL *sql.DB
-	// Mgo *mgo.database
 }
 
-// DBConn ...
 var dbConn = &DB{}
 
-// ConnectSQL ...
-func ConnectSQL() (*DB, error) {
-
-	//dbName := os.Getenv("DB_NAME")
-	//dbPass := os.Getenv("DB_PASS")
-	//dbHost := os.Getenv("DB_HOST")
-	//dbPort := os.Getenv("DB_PORT")
-	// geçici olarak basit kullanım
-	dbName := "golang-db"
-	dbUname := "golang"
-	dbPass := "golangpass"
-	dbHost := "app-mysql" // mysql container name olmalı
-
-	dbSource := fmt.Sprintf(
-		"%s:%s@tcp(%s)/%s?parseTime=true",
-		dbUname,
-		dbPass,
-		dbHost,
-		dbName,
-	)
-	d, err := sql.Open("mysql", dbSource)
+func ConnectSQL(dsn string) (*DB, error) {
+	d, err := NewDatabase(dsn)
 	if err != nil {
 		panic(err)
 	}
@@ -43,9 +20,15 @@ func ConnectSQL() (*DB, error) {
 	dbConn.SQL = d
 	return dbConn, err
 }
+func NewDatabase(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
 
-// ConnectMgo ....
-func ConnectMgo(host, port, uname, pass string) error {
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
 
-	return nil
+	return db, nil
 }
