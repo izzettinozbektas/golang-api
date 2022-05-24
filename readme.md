@@ -1,4 +1,4 @@
-Kullanılan 3. parti uygulamalar ->
- Bu cli pcnizde kurulu olması gereklı [Buffalo Databese Tool ](https://gobuffalo.io/documentation/database/soda/)
-- soda migrate 
+##### Test golang-api application with docker
 - docker-compose up -d 
+- docker compose --profile tools run migrate
+- postman collection import edip authenticate işlemlerini deneye bilirsiniz

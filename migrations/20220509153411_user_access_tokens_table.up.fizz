@@ -1,7 +1,0 @@
-create_table("user_access_tokens"){
-   t.Column("id", "integer",{primary: true})
-   t.Column("token", "string",{"default": ""})
-   t.Column("exp_date", "datetime", {})
-   t.Column("created_at", "datetime", {})
-   t.DisableTimestamps()
-}

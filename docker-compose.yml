@@ -58,6 +58,24 @@ services:
     networks:
       - app-network
 
+  #migration create
+  migrate: &basemigrate
+    profiles: [ "tools" ]
+    image: migrate/migrate
+    entrypoint: ["migrate", "-database", "mysql://golang:golangpass@tcp(app-mysql)/golang-db" ,"-path" ,"/tmp/migrations"]
+    command: up
+    links:
+      - mysql
+    volumes:
+      - ./migrations:/tmp/migrations
+    networks:
+      - app-network
+
+  create-migration:
+    <<: *basemigrate
+    entrypoint: migrate create -dir /tmp/migrations -ext sql
+    command: ""
+
 networks:
   app-network:
     driver: bridge
