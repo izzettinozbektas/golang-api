@@ -1,1 +1,0 @@
-sql("drop table user_access_tokens")
