@@ -38,13 +38,9 @@ func main() {
 }
 func run() (*driver.DB, error) {
 
-	//geçici olarak kullanım,
-	dbName := "golang-db"
-	dbUname := "golang"
-	dbPass := "golangpass"
-	dbHost := "app-mysql" // mysql container name olmalı
+	config := helpers.GetConfig()
 
-	connectionString := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", dbUname, dbPass, dbHost, dbName)
+	connectionString := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true", config.DBUNAME, config.DBPASS, config.DBHOST, config.DBNAME)
 	db, err := driver.ConnectSQL(connectionString)
 	if err != nil {
 		log.Fatal("Cannot connect to database! Dying...")

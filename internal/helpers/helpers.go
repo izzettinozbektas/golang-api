@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-redis/redis"
+	"github.com/izzettinozbektas/golang-api/internal/config"
 	"github.com/izzettinozbektas/golang-api/internal/models"
 	"golang.org/x/crypto/bcrypt"
 	"log"
@@ -18,7 +19,7 @@ import (
 )
 
 func GetQuoteFromAPI() (*models.QuoteResponse, error) {
-	API_URL := "http://quotes.rest/qod.json"
+	API_URL := GetConfig().GetQuoteFromAPI
 	resp, err := http.Get(API_URL)
 	if err != nil {
 		return nil, err
@@ -35,7 +36,13 @@ func GetQuoteFromAPI() (*models.QuoteResponse, error) {
 	}
 
 }
-
+func GetConfig() config.Config {
+	config, err := config.LoadConfig("build/")
+	if err != nil {
+		log.Fatal("cannot load config", err)
+	}
+	return config
+}
 func WaitForShutdown(srv *http.Server) {
 	interruptChan := make(chan os.Signal, 1)
 	signal.Notify(interruptChan, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -55,8 +62,8 @@ func WaitForShutdown(srv *http.Server) {
 func ConnetToRedis() redis.Client {
 	// Create Redis Client
 	client := redis.NewClient(&redis.Options{
-		Addr:     getEnv("REDIS_URL", "localhost:6379"),
-		Password: getEnv("REDIS_PASSWORD", ""),
+		Addr:     GetConfig().REDISURL,
+		Password: GetConfig().REDISPASS,
 		DB:       0,
 	})
 
@@ -65,14 +72,6 @@ func ConnetToRedis() redis.Client {
 		log.Fatal(err)
 	}
 	return *client
-}
-
-func getEnv(key, defaultValue string) string {
-	value := os.Getenv(key)
-	if value == "" {
-		return defaultValue
-	}
-	return value
 }
 
 func HashPassword(password string) string {
