@@ -110,6 +110,28 @@ func (m *mysqlDBRepo) User(id int) (models.User, error) {
 	}
 	return user, nil
 }
+func (m *mysqlDBRepo) UserFromEmail(email string) (models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var user models.User
+
+	query := `select id, first_name, last_name, email, access_level, created_at, updated_at from users where email = ?`
+	row := m.DB.QueryRowContext(ctx, query, email)
+	err := row.Scan(
+		&user.ID,
+		&user.FirstName,
+		&user.LastName,
+		&user.Email,
+		&user.AccessLevel,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
 func (m *mysqlDBRepo) UserDelete(id int) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

@@ -13,4 +13,5 @@ type DatabaseRepo interface {
 	Login(res models.Authentication) (models.User, error)
 	LoginCreate(token string) (bool, error)
 	TokenControl(token string) (models.UserAcccessInfo, error)
+	UserFromEmail(email string) (models.User, error)
 }

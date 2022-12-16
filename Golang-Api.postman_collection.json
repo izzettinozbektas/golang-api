@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "10f3b6e8-3e84-4bba-97f2-c884c06bb38d",
+		"_postman_id": "c3cea208-a069-407f-b370-cf7757d6d73f",
 		"name": "Golang-Api",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -186,6 +186,34 @@
 					"port": "8080",
 					"path": [
 						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UserInfoFromToken",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJleHAiOiIyMDIyLTEyLTE2IDE0OjUyOjQ5Iiwicm9sZSI6Ilx1MDAwMSJ9.f1XodZdUdtYtD_chuWhhK_kkAldut_A5hT6AoON2HzI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/getUserData",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"getUserData"
 					]
 				}
 			},

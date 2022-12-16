@@ -21,6 +21,7 @@ func Routes() http.Handler {
 	mux.Post("/user", handlers.Repo.UserCreate)
 
 	mux.With(middleware.Auth).Group(func(r chi.Router) {
+		r.Get("/getUserData", handlers.Repo.GetUserInformation)
 		r.Get("/users", handlers.Repo.Users)
 		r.Put("/user/{id}", handlers.Repo.UserUpdate)
 		r.Get("/user/{id}", handlers.Repo.User)

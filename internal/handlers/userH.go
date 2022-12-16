@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/go-chi/chi"
 	"github.com/izzettinozbektas/golang-api/internal/helpers"
 	"github.com/izzettinozbektas/golang-api/internal/models"
@@ -8,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -80,4 +82,20 @@ func (m *Repository) UserDelete(w http.ResponseWriter, r *http.Request) {
 		response.Write(w, response.Success("işlem başarılı", nil), response.Code(http.StatusOK))
 	}
 
+}
+func (m *Repository) GetUserInformation(w http.ResponseWriter, r *http.Request) {
+	resp := make(map[string]interface{})
+
+	authToken := r.Header.Get("Authorization")
+	data, _ := helpers.DecodeJWT(strings.ReplaceAll(authToken, "Bearer ", ""))
+	var token models.Token
+	token.Email = fmt.Sprint(data["email"])
+	user, err := m.DB.UserFromEmail(token.Email)
+
+	if err != nil {
+		response.Write(w, response.Error("işlem başarısız", map[string]string{"error": err.Error()}), response.Code(http.StatusNotFound))
+	} else {
+		resp["user"] = user
+		response.Write(w, response.Success("", resp), response.Code(http.StatusOK))
+	}
 }
