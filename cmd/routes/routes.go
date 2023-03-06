@@ -26,6 +26,8 @@ func Routes() http.Handler {
 		r.Put("/user/{id}", handlers.Repo.UserUpdate)
 		r.Get("/user/{id}", handlers.Repo.User)
 		r.Delete("/user/{id}", handlers.Repo.UserDelete)
+
+		r.Post("/fileUpload", handlers.Repo.UploadFile)
 		return
 	})
 

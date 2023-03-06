@@ -15,3 +15,7 @@ type DatabaseRepo interface {
 	TokenControl(token string) (models.UserAcccessInfo, error)
 	UserFromEmail(email string) (models.User, error)
 }
+
+type FileRepo interface {
+	UploadFile()
+}
